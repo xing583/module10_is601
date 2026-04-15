@@ -1,7 +1,7 @@
-# Module 10: Secure User Model & CI/CD
+# Module 10 & 11: Secure User Model & Calculation System
 
 ## Overview
-A FastAPI application with secure user authentication using SQLAlchemy, Pydantic, and bcrypt password hashing.
+A FastAPI application with secure user authentication and a calculation system using SQLAlchemy, Pydantic, bcrypt, and a factory design pattern.
 
 ## How to Run Tests Locally
 
@@ -25,6 +25,11 @@ pytest tests/test_unit.py -v
 ### 4. Run integration tests (requires database)
 ```bash
 TEST_DATABASE_URL=postgresql://user:password@localhost:5432/appdb pytest tests/test_integration.py -v
+```
+
+### 5. Run all tests
+```bash
+TEST_DATABASE_URL=postgresql://user:password@localhost:5432/appdb pytest -v
 ```
 
 ## Docker Hub
