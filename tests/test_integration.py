@@ -5,6 +5,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from main import app
 from app.database import Base, get_db
+from app.models import Calculation
+from app.calculator import CalculationFactory, CalculationType
 
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
@@ -31,6 +33,7 @@ def client(db_session):
         yield c
     app.dependency_overrides.clear()
 
+# ---- User 测试 ----
 def test_health_check(client):
     response = client.get("/health")
     assert response.status_code == 200
@@ -59,3 +62,41 @@ def test_duplicate_email(client):
 def test_get_user_not_found(client):
     response = client.get("/users/9999")
     assert response.status_code == 404
+
+# ---- Calculation 集成测试 ----
+def test_store_calculation_add(db_session):
+    op = CalculationFactory.create(CalculationType.ADD)
+    result = op.calculate(3, 4)
+    calc = Calculation(a=3, b=4, type="Add", result=result)
+    db_session.add(calc)
+    db_session.commit()
+    db_session.refresh(calc)
+    assert calc.id is not None
+    assert calc.result == 7
+
+def test_store_calculation_subtract(db_session):
+    op = CalculationFactory.create(CalculationType.SUBTRACT)
+    result = op.calculate(10, 3)
+    calc = Calculation(a=10, b=3, type="Subtract", result=result)
+    db_session.add(calc)
+    db_session.commit()
+    db_session.refresh(calc)
+    assert calc.result == 7
+
+def test_store_calculation_multiply(db_session):
+    op = CalculationFactory.create(CalculationType.MULTIPLY)
+    result = op.calculate(3, 4)
+    calc = Calculation(a=3, b=4, type="Multiply", result=result)
+    db_session.add(calc)
+    db_session.commit()
+    db_session.refresh(calc)
+    assert calc.result == 12
+
+def test_store_calculation_divide(db_session):
+    op = CalculationFactory.create(CalculationType.DIVIDE)
+    result = op.calculate(10, 2)
+    calc = Calculation(a=10, b=2, type="Divide", result=result)
+    db_session.add(calc)
+    db_session.commit()
+    db_session.refresh(calc)
+    assert calc.result == 5

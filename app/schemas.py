@@ -1,5 +1,7 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, field_validator
+from typing import Optional
+from pydantic import BaseModel, EmailStr, field_validator, model_validator
+from app.calculator import CalculationType
 
 class UserCreate(BaseModel):
     username: str
@@ -25,5 +27,28 @@ class UserRead(BaseModel):
     username: str
     email: str
     created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+class CalculationCreate(BaseModel):
+    a: float
+    b: float
+    type: CalculationType
+    user_id: Optional[int] = None
+
+    @model_validator(mode="after")
+    def check_divide_by_zero(self):
+        if self.type == CalculationType.DIVIDE and self.b == 0:
+            raise ValueError("Cannot divide by zero")
+        return self
+
+class CalculationRead(BaseModel):
+    id: int
+    a: float
+    b: float
+    type: str
+    result: float
+    created_at: datetime
+    user_id: Optional[int] = None
 
     model_config = {"from_attributes": True}
